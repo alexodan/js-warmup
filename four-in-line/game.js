@@ -19,67 +19,72 @@ squares
   });
 
 function handleClickSquare(e) {
+  console.log("target:", e.target);
   var square = e.target;
   var row = square.parentElement;
+  console.log("row", row);
   var column = [].slice.call(row.children).indexOf(square);
-  putCoinOnBoard(column, boardState);
+  console.log("col", column);
+  boardState = putCoinOnBoard(column, Object.freeze(boardState));
 }
 
 function putCoinOnBoard(column, boardState) {
   // loop over the respective column bottom up
   var newBoardState = [...boardState];
-  for (let i = rows.length - 1; i > 0; i--) {
+  for (let i = rows.length - 1; i >= 0; i--) {
     if (newBoardState[i][column] === "") {
       newBoardState[i][column] = currentPlayer;
       currentPlayer = currentPlayer === "red" ? "blue" : "red";
       break;
     }
   }
-  repaintBoard(newBoardState);
-  determineWinner(newBoardState);
+  repaintBoard(Object.freeze(newBoardState));
+  determineWinner(Object.freeze(newBoardState));
+  return newBoardState;
 }
 
 function determineWinner(boardState) {
   var isWinner =
-    checkHorizontals(boardState) ||
-    checkVerticals(boardState) ||
-    checkDiagonals(boardState);
+    checkDiagonals(Object.freeze(boardState)) ||
+    checkHorizontals(Object.freeze(boardState)) ||
+    checkVerticals(Object.freeze(boardState));
   if (isWinner) {
     var winner = currentPlayer === "red" ? "blue" : "red";
     alert(`${winner} won the game!`);
   }
 }
 
-function checkDiagonals(boardState) {
-  for (let i = 0; i < boardState[i].length; i++) {
-    for (let j = 0; j < boardState[i][j].length; j++) {
-      const element = boardState[i][j];
-    }
-  }
+function hasFourInLine(arr) {
+  return (
+    arr.join("_").includes("blue_blue_blue_blue") ||
+    arr.join("_").includes("red_red_red_red")
+  );
 }
 
+function checkDiagonals(boardState) {}
+
 function checkHorizontals(boardState) {
-  for (let i = 0; i < boardState[i].length; i++) {
-    for (let j = 0; j < boardState[i][j].length; j++) {
-      const element = boardState[i][j];
-    }
-  }
+  return boardState.find(hasFourInLine);
 }
 
 function checkVerticals(boardState) {
-  for (let i = 0; i < boardState[i].length; i++) {
-    for (let j = 0; j < boardState[i][j].length; j++) {
-      const element = boardState[i][j];
+  var columns = [];
+  for (let i = 0; i < boardState[0].length - 1; i++) {
+    for (let j = 0; j < boardState.length; j++) {
+      columns.push(boardState[j][i]);
     }
   }
+  return hasFourInLine(columns);
 }
 
 function repaintBoard(boardState) {
-  for (let i = 0; i < boardState[i]; i++) {
-    for (let j = 0; j < boardState[j]; j++) {
-      if (squares[i][j].children.length === 0) {
+  for (let i = 0; i < boardState.length; i++) {
+    for (let j = 0; j < boardState[i].length; j++) {
+      if (boardState[i][j] !== "" && squares[i][j].children.length === 0) {
         let coin = document.createElement("div");
-        coin = addClass(Object.freeze(coin), boardState[i][j]);
+        coin = addClass(coin, "coin");
+        coin = addClass(coin, boardState[i][j]);
+        coin.addEventListener("click", () => {});
         squares[i][j].appendChild(coin);
       }
     }
@@ -87,9 +92,8 @@ function repaintBoard(boardState) {
 }
 
 function addClass(element, className) {
-  var newElement = { ...element };
-  if (!newElement.classList.contains(className)) {
-    newElement.classList.add(className);
+  if (!element.classList.contains(className)) {
+    element.classList.add(className);
   }
-  return newElement;
+  return element;
 }
