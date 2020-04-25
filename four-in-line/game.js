@@ -61,7 +61,12 @@ function hasFourInLine(arr) {
   );
 }
 
-function checkDiagonals(boardState) {}
+function checkDiagonals(boardState) {
+  // la idea es iterar sobre i (pero i < columnas) y recorrer
+  // en diagonal hacia la izquierda y hacia abajo hasta llegar
+  // la mitad del tablero, luego hacer lo mismo pero con la
+  // esquina inferior derecha
+}
 
 function checkHorizontals(boardState) {
   return boardState.find(hasFourInLine);
@@ -82,8 +87,8 @@ function repaintBoard(boardState) {
     for (let j = 0; j < boardState[i].length; j++) {
       if (boardState[i][j] !== "" && squares[i][j].children.length === 0) {
         let coin = document.createElement("div");
-        coin = addClass(coin, "coin");
-        coin = addClass(coin, boardState[i][j]);
+        addClass(coin, "coin");
+        addClass(coin, boardState[i][j]);
         coin.addEventListener("click", () => {});
         squares[i][j].appendChild(coin);
       }
@@ -95,5 +100,4 @@ function addClass(element, className) {
   if (!element.classList.contains(className)) {
     element.classList.add(className);
   }
-  return element;
 }
